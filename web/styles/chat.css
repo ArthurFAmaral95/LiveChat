@@ -112,6 +112,8 @@ h1 {
   font-weight: 500;
 
   text-transform: capitalize;
+
+  color: navy;
 }
 
 .message-box .message-time {
