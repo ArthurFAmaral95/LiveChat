@@ -103,8 +103,15 @@ h1 {
   background-color: lightblue;
 }
 
-.message-box .message-text {
+.message-box .message-text,
+.message-box .message-user {
   font-size: 1.6rem;
+}
+
+.message-box .message-user {
+  font-weight: 500;
+
+  text-transform: capitalize;
 }
 
 .message-box .message-time {

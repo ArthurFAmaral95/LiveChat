@@ -16,7 +16,13 @@ function sendMessage(e) {
   if (messageInput.value) {
     const date = new Date()
     const hour = date.getHours()
-    const minutes = date.getMinutes()
+    let minutes
+
+    if (date.getMinutes() < 10) {
+      minutes = `0${date.getMinutes()}`
+    } else {
+      minutes = date.getMinutes()
+    }
 
     const message = {
       msgHour: hour,
@@ -46,10 +52,12 @@ function loginUser(e) {
 
 socket.on('chat message', msg => {
   const messageBox = document.createElement('div')
+  const messageUser = document.createElement('span')
   const messageTime = document.createElement('span')
   const messageText = document.createElement('span')
 
   messageBox.classList.add('message-box')
+  messageUser.classList.add('message-user')
   messageTime.classList.add('message-time')
   messageText.classList.add('message-text')
 
@@ -57,12 +65,13 @@ socket.on('chat message', msg => {
     messageBox.classList.add('own-message')
   } else {
     messageBox.classList.add('outside-message')
+    messageUser.innerText = msg.user
   }
 
   messageTime.innerText = `${msg.msgHour}:${msg.msgMinutes}`
   messageText.innerText = msg.msgText
 
-  messageBox.append(messageText, messageTime)
+  messageBox.append(messageUser, messageText, messageTime)
   chatBox.append(messageBox)
 
   chatBox.scrollTo(0, chatBox.scrollHeight)
