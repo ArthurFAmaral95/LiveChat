@@ -14,7 +14,7 @@ const registerUser = async (req, res) => {
     ])
     .into('users')
     .then(() => {
-      res.send(`Welcome ${req.body.userName}`)
+      res.send(`Welcome, ${req.body.userName}`)
     })
     .catch(err => {
       res.status(400).send(err)
