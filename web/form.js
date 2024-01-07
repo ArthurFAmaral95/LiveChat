@@ -33,11 +33,13 @@ socket.on('chat message', msg => {
   messageTime.classList.add('message-time')
   messageText.classList.add('message-text')
 
-  messageTime.innerText = `${msg.msgHour}: ${msg.msgMinutes}:`
+  messageTime.innerText = `${msg.msgHour}: ${msg.msgMinutes}`
   messageText.innerText = msg.msgText
 
-  messageBox.append(messageTime, messageText)
+  messageBox.append(messageText, messageTime)
   chatBox.append(messageBox)
+
+  chatBox.scrollTo(0, chatBox.scrollHeight)
 })
 
 input.addEventListener('keydown', e => {

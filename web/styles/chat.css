@@ -50,7 +50,7 @@ h1 {
   width: 100%;
   height: 100%;
 
-  overflow: hidden;
+  overflow: scroll;
 
   border: 1px solid black;
   border-radius: 1rem;
@@ -66,19 +66,26 @@ h1 {
   border: 1px solid gray;
   border-radius: 1rem;
 
-  padding: 0.5rem 1rem;
+  padding: 0.5rem 2rem 0.5rem 1rem;
 
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
+  flex-direction: column;
+
+  gap: 0.1rem;
 
   width: fit-content;
 
   background-color: lightblue;
 }
 
-.message-box span {
+.message-box .message-text {
   font-size: 1.6rem;
+}
+
+.message-box .message-time {
+  align-self: flex-end;
+
+  margin-right: -1rem;
 }
 
 form {
