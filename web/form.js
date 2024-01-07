@@ -1,5 +1,10 @@
 const loginForm = document.querySelector('.login-form')
-const userInput = document.querySelector('input#user-login')
+const userLogin = document.querySelector('input#user-login')
+const passwordLogin = document.querySelector('input#password-login')
+
+const registerForm = document.querySelector('.register-form')
+const userRegister = document.querySelector('input#user-register')
+const passwordRegister = document.querySelector('input#password-register')
 
 const chatBox = document.querySelector('.chat-box')
 const messageForm = document.querySelector('.message-form')
@@ -39,12 +44,13 @@ function sendMessage(e) {
 
 function loginUser(e) {
   e.preventDefault()
-  if (userInput.value) {
-    user = userInput.value
+  if (userLogin.value) {
+    user = userLogin.value
 
     chatBox.classList.remove('hidden')
     footer.classList.remove('hidden')
     loginForm.classList.add('hidden')
+    registerForm.classList.add('hidden')
 
     loginForm.reset()
   }
