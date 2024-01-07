@@ -15,10 +15,20 @@
       <h1>Chat</h1>
     </header>
     <main>
-      <section class="chat-box"></section>
+      <form class="user-form">
+        <label for="user">User:</label>
+        <input
+          type="text"
+          id="user"
+          name="user"
+          placeholder="Type here your name to start chating"
+        />
+        <button>Login</button>
+      </form>
+      <section class="chat-box hidden"></section>
     </main>
-    <footer>
-      <form>
+    <footer class="hidden">
+      <form class="message-form">
         <textarea name="message" id="message-input"></textarea>
         <button>Send</button>
       </form>

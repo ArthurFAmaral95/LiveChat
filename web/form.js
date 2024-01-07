@@ -1,13 +1,19 @@
+const userForm = document.querySelector('.user-form')
+const userInput = document.querySelector('input#user')
+
 const chatBox = document.querySelector('.chat-box')
-const form = document.querySelector('form')
-const input = document.querySelector('textarea')
+const messageForm = document.querySelector('.message-form')
+const messageInput = document.querySelector('textarea')
+const footer = document.querySelector('footer')
+
+let user
 
 const socket = io()
 
 function sendMessage(e) {
   e.preventDefault()
 
-  if (input.value) {
+  if (messageInput.value) {
     const date = new Date()
     const hour = date.getHours()
     const minutes = date.getMinutes()
@@ -15,12 +21,26 @@ function sendMessage(e) {
     const message = {
       msgHour: hour,
       msgMinutes: minutes,
-      msgText: input.value
+      msgText: messageInput.value,
+      user: user
     }
 
     socket.emit('chat message', message)
 
-    form.reset()
+    messageForm.reset()
+  }
+}
+
+function loginUser(e) {
+  e.preventDefault()
+  if (userInput.value) {
+    user = userInput.value
+
+    chatBox.classList.remove('hidden')
+    footer.classList.remove('hidden')
+    userForm.classList.add('hidden')
+
+    userForm.reset()
   }
 }
 
@@ -33,7 +53,13 @@ socket.on('chat message', msg => {
   messageTime.classList.add('message-time')
   messageText.classList.add('message-text')
 
-  messageTime.innerText = `${msg.msgHour}: ${msg.msgMinutes}`
+  if (msg.user === user) {
+    messageBox.classList.add('own-message')
+  } else {
+    messageBox.classList.add('outside-message')
+  }
+
+  messageTime.innerText = `${msg.msgHour}:${msg.msgMinutes}`
   messageText.innerText = msg.msgText
 
   messageBox.append(messageText, messageTime)
@@ -42,18 +68,20 @@ socket.on('chat message', msg => {
   chatBox.scrollTo(0, chatBox.scrollHeight)
 })
 
-input.addEventListener('keydown', e => {
+userForm.addEventListener('submit', loginUser)
+
+messageInput.addEventListener('keydown', e => {
   if (e.key === 'Enter' && !e.shiftKey) {
     e.preventDefault()
   }
 })
 
-form.addEventListener('submit', sendMessage)
+messageForm.addEventListener('submit', sendMessage)
 
 document.addEventListener('keydown', e => {
   if (e.key === 'Enter' && e.shiftKey) {
     return
-  } else if (e.key === 'Enter' && input.value !== '') {
-    form.dispatchEvent(new Event('submit'))
+  } else if (e.key === 'Enter' && messageInput.value !== '') {
+    messageForm.dispatchEvent(new Event('submit'))
   }
 })
