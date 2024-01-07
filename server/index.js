@@ -1,8 +1,12 @@
 import express from 'express'
+import { createServer } from 'node:http'
 import path from 'path'
+import { Server } from 'socket.io'
 
 const app = express()
+const server = createServer(app)
 app.use(express.static('./'))
+const io = new Server(server)
 
 const PORT = process.env.port || 3000
 
@@ -12,6 +16,18 @@ app.get('/', (req, res) => {
   res.sendFile(HTMLPath)
 })
 
-app.listen(PORT, () => {
+io.on('connection', socket => {
+  console.log('a user connected')
+
+  socket.on('chat message', msg => {
+    io.emit('chat message', msg)
+  })
+
+  socket.on('disconnect', () => {
+    console.log('user disconnected')
+  })
+})
+
+server.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`)
 })
