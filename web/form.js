@@ -8,7 +8,17 @@ function sendMessage(e) {
   e.preventDefault()
 
   if (input.value) {
-    socket.emit('chat message', input.value)
+    const date = new Date()
+    const hour = date.getHours()
+    const minutes = date.getMinutes()
+
+    const message = {
+      msgHour: hour,
+      msgMinutes: minutes,
+      msgText: input.value
+    }
+
+    socket.emit('chat message', message)
 
     form.reset()
   }
@@ -23,8 +33,8 @@ socket.on('chat message', msg => {
   messageTime.classList.add('message-time')
   messageText.classList.add('message-text')
 
-  messageTime.innerText = 'test'
-  messageText.innerText = msg
+  messageTime.innerText = `${msg.msgHour}: ${msg.msgMinutes}:`
+  messageText.innerText = msg.msgText
 
   messageBox.append(messageTime, messageText)
   chatBox.append(messageBox)

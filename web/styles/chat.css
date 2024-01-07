@@ -77,8 +77,8 @@ h1 {
   background-color: lightblue;
 }
 
-.message span {
-  font-size: 1.2rem;
+.message-box span {
+  font-size: 1.6rem;
 }
 
 form {
