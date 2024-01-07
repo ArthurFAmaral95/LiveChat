@@ -1,14 +1,19 @@
 const userForm = document.querySelector('.user-form')
+const userInput = document.querySelector('input#user')
+
 const chatBox = document.querySelector('.chat-box')
 const messageForm = document.querySelector('.message-form')
-const input = document.querySelector('textarea')
+const messageInput = document.querySelector('textarea')
+const footer = document.querySelector('footer')
+
+let user
 
 const socket = io()
 
 function sendMessage(e) {
   e.preventDefault()
 
-  if (input.value) {
+  if (messageInput.value) {
     const date = new Date()
     const hour = date.getHours()
     const minutes = date.getMinutes()
@@ -16,12 +21,26 @@ function sendMessage(e) {
     const message = {
       msgHour: hour,
       msgMinutes: minutes,
-      msgText: input.value
+      msgText: messageInput.value
     }
 
     socket.emit('chat message', message)
 
     messageForm.reset()
+  }
+}
+
+function loginUser(e) {
+  e.preventDefault()
+  if (userInput.value) {
+    user = userInput.value
+    console.log(user)
+
+    chatBox.classList.remove('hidden')
+    footer.classList.remove('hidden')
+    userForm.classList.add('hidden')
+
+    userForm.reset()
   }
 }
 
@@ -43,7 +62,9 @@ socket.on('chat message', msg => {
   chatBox.scrollTo(0, chatBox.scrollHeight)
 })
 
-input.addEventListener('keydown', e => {
+userForm.addEventListener('submit', loginUser)
+
+messageInput.addEventListener('keydown', e => {
   if (e.key === 'Enter' && !e.shiftKey) {
     e.preventDefault()
   }
@@ -54,7 +75,7 @@ messageForm.addEventListener('submit', sendMessage)
 document.addEventListener('keydown', e => {
   if (e.key === 'Enter' && e.shiftKey) {
     return
-  } else if (e.key === 'Enter' && input.value !== '') {
+  } else if (e.key === 'Enter' && messageInput.value !== '') {
     messageForm.dispatchEvent(new Event('submit'))
   }
 })
