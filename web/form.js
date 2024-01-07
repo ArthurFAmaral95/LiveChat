@@ -1,3 +1,5 @@
+import axios from 'axios'
+
 const loginForm = document.querySelector('.login-form')
 const userLogin = document.querySelector('input#user-login')
 const passwordLogin = document.querySelector('input#password-login')
@@ -44,15 +46,24 @@ function sendMessage(e) {
 
 function loginUser(e) {
   e.preventDefault()
+
   if (userLogin.value) {
-    user = userLogin.value
+    axios
+      .post('http://localhost:3000/login', {
+        userName: userLogin.value,
+        password: passwordLogin.value
+      })
+      .then(response => {
+        console.log(response)
+        user = userLogin.value
 
-    chatBox.classList.remove('hidden')
-    footer.classList.remove('hidden')
-    loginForm.classList.add('hidden')
-    registerForm.classList.add('hidden')
+        chatBox.classList.remove('hidden')
+        footer.classList.remove('hidden')
+        loginForm.classList.add('hidden')
+        registerForm.classList.add('hidden')
 
-    loginForm.reset()
+        loginForm.reset()
+      })
   }
 }
 

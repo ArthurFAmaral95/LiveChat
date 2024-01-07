@@ -6,7 +6,15 @@
 
     <link rel="stylesheet" href="./web/styles/chat.css" />
 
-    <script src="./web/form.js" type="module"></script>
+    <script type="importmap">
+      {
+        "imports": {
+          "axios": "https://cdn.jsdelivr.net/npm/axios@1.6.5/+esm"
+        }
+      }
+    </script>
+
+    <script type="module" src="./web/form.js"></script>
 
     <title>Chat</title>
   </head>

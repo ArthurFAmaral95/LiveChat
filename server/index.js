@@ -1,4 +1,4 @@
-import express, { json } from 'express'
+import express from 'express'
 import { createServer } from 'node:http'
 import path from 'path'
 import { Server } from 'socket.io'
