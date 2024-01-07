@@ -89,6 +89,16 @@ h1 {
   gap: 0.1rem;
 
   width: fit-content;
+}
+
+.message-box.own-message {
+  align-self: flex-end;
+
+  background-color: lightgreen;
+}
+
+.message-box.outside-message {
+  align-self: flex-start;
 
   background-color: lightblue;
 }
@@ -125,7 +135,7 @@ button {
 
   border-top-right-radius: 1rem;
   border-bottom-right-radius: 1rem;
-  
+
   padding: 0.5rem 1rem;
 }
 

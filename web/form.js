@@ -21,7 +21,8 @@ function sendMessage(e) {
     const message = {
       msgHour: hour,
       msgMinutes: minutes,
-      msgText: messageInput.value
+      msgText: messageInput.value,
+      user: user
     }
 
     socket.emit('chat message', message)
@@ -34,7 +35,6 @@ function loginUser(e) {
   e.preventDefault()
   if (userInput.value) {
     user = userInput.value
-    console.log(user)
 
     chatBox.classList.remove('hidden')
     footer.classList.remove('hidden')
@@ -53,7 +53,13 @@ socket.on('chat message', msg => {
   messageTime.classList.add('message-time')
   messageText.classList.add('message-text')
 
-  messageTime.innerText = `${msg.msgHour}: ${msg.msgMinutes}`
+  if (msg.user === user) {
+    messageBox.classList.add('own-message')
+  } else {
+    messageBox.classList.add('outside-message')
+  }
+
+  messageTime.innerText = `${msg.msgHour}:${msg.msgMinutes}`
   messageText.innerText = msg.msgText
 
   messageBox.append(messageText, messageTime)
