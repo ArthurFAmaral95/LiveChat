@@ -1,5 +1,5 @@
-const userForm = document.querySelector('.user-form')
-const userInput = document.querySelector('input#user')
+const loginForm = document.querySelector('.login-form')
+const userInput = document.querySelector('input#user-login')
 
 const chatBox = document.querySelector('.chat-box')
 const messageForm = document.querySelector('.message-form')
@@ -44,9 +44,9 @@ function loginUser(e) {
 
     chatBox.classList.remove('hidden')
     footer.classList.remove('hidden')
-    userForm.classList.add('hidden')
+    loginForm.classList.add('hidden')
 
-    userForm.reset()
+    loginForm.reset()
   }
 }
 
@@ -77,7 +77,7 @@ socket.on('chat message', msg => {
   chatBox.scrollTo(0, chatBox.scrollHeight)
 })
 
-userForm.addEventListener('submit', loginUser)
+loginForm.addEventListener('submit', loginUser)
 
 messageInput.addEventListener('keydown', e => {
   if (e.key === 'Enter' && !e.shiftKey) {
