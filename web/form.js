@@ -1,5 +1,6 @@
+const userForm = document.querySelector('.user-form')
 const chatBox = document.querySelector('.chat-box')
-const form = document.querySelector('form')
+const messageForm = document.querySelector('.message-form')
 const input = document.querySelector('textarea')
 
 const socket = io()
@@ -20,7 +21,7 @@ function sendMessage(e) {
 
     socket.emit('chat message', message)
 
-    form.reset()
+    messageForm.reset()
   }
 }
 
@@ -48,12 +49,12 @@ input.addEventListener('keydown', e => {
   }
 })
 
-form.addEventListener('submit', sendMessage)
+messageForm.addEventListener('submit', sendMessage)
 
 document.addEventListener('keydown', e => {
   if (e.key === 'Enter' && e.shiftKey) {
     return
   } else if (e.key === 'Enter' && input.value !== '') {
-    form.dispatchEvent(new Event('submit'))
+    messageForm.dispatchEvent(new Event('submit'))
   }
 })
