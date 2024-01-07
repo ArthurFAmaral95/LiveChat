@@ -50,6 +50,16 @@ legend {
   font-size: 1.5rem;
 }
 
+.labels {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+span.error {
+  color: red;
+}
+
 .login-form,
 .register-form {
   display: flex;
@@ -68,7 +78,6 @@ legend {
   margin-right: 0.5rem;
 
   display: block;
-  width: 10rem;
 }
 
 .login-form input,

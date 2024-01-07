@@ -54,7 +54,7 @@ function loginUser(e) {
         password: passwordLogin.value
       })
       .then(response => {
-        console.log(response)
+        console.log(response.data)
         user = userLogin.value
 
         chatBox.classList.remove('hidden')
@@ -63,6 +63,34 @@ function loginUser(e) {
         registerForm.classList.add('hidden')
 
         loginForm.reset()
+      })
+      .catch(err => {
+        const errorMessages = document.querySelectorAll('span.error')
+        errorMessages.forEach(message => {
+          message.textContent = ''
+        })
+
+        if (err.response.data.error === 'user') {
+          const labels = document.querySelector('.labels.user-login')
+          const errorMessage = document.createElement('span')
+
+          errorMessage.classList.add('error')
+
+          errorMessage.textContent = err.response.data.message
+
+          labels.append(errorMessage)
+        } else if (err.response.data.error === 'password') {
+          const labels = document.querySelector('.labels.password-login')
+          const errorMessage = document.createElement('span')
+
+          errorMessage.classList.add('error')
+
+          errorMessage.textContent = err.response.data.message
+
+          labels.append(errorMessage)
+        } else {
+          console.error(err)
+        }
       })
   }
 }
