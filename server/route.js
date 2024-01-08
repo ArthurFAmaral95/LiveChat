@@ -8,4 +8,6 @@ router.post('/register', routes.registerUser)
 
 router.post('/login', routes.loginUser)
 
+router.post('/newChat', routes.newChat)
+
 export { router }

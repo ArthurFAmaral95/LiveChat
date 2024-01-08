@@ -179,3 +179,18 @@ document.addEventListener('keydown', e => {
     messageForm.dispatchEvent(new Event('submit'))
   }
 })
+
+const users = [
+  {
+    userName: 'Arthur',
+    userId: 1
+  },
+  {
+    userName: 'Amaral',
+    userId: 2
+  }
+]
+
+const reverseUsers = users.toReversed()
+
+console.log({users, reverseUsers})
