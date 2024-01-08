@@ -8,7 +8,8 @@ const registerForm = document.querySelector('.register-form')
 const userRegister = document.querySelector('input#user-register')
 const passwordRegister = document.querySelector('input#password-register')
 
-const chats = document.querySelector('aside')
+const aside = document.querySelector('aside')
+const chats = document.querySelector('ul.chats')
 
 const chatBox = document.querySelector('.chat-box')
 const messageForm = document.querySelector('.message-form')
@@ -18,6 +19,8 @@ const footer = document.querySelector('footer')
 
 let user
 let userId
+let rawUserChatsData
+const userChatsData = []
 
 const socket = io()
 
@@ -61,11 +64,47 @@ function loginUser(e) {
 
       user = userLogin.value
       userId = response.data.userId
+      rawUserChatsData = response.data.userChats
+    })
+    .then(() => {
+      rawUserChatsData.map(chat => {
+        let usersInChat = JSON.parse(chat.users)
+        usersInChat.map(chatUser => {
+          if (chatUser.name !== user) {
+            const chatDetails = {
+              chatId: chat.chat_id,
+              otherUserInChat: chatUser.name
+            }
+
+            userChatsData.push(chatDetails)
+          }
+        })
+      })
+    })
+    .then(() => {
+      userChatsData.map(chat => {
+        const chatItem = document.createElement('li')
+        const userSpan = document.createElement('span')
+        const messageSpan = document.createElement('span')
+
+        chatItem.classList.add('chat')
+        chatItem.setAttribute('data-chat-id', chat.chatId)
+        chatItem.setAttribute('data-receiver', chat.otherUserInChat)
+
+        userSpan.classList.add('user')
+        messageSpan.classList.add('last-message')
+
+        userSpan.textContent = chat.otherUserInChat
+        messageSpan.textContent = 'last message'
+
+        chatItem.append(userSpan, messageSpan)
+        chats.append(chatItem)
+      })
     })
     .then(() => {
       chatBox.classList.remove('hidden')
       footer.classList.remove('hidden')
-      chats.classList.remove('hidden')
+      aside.classList.remove('hidden')
       loginForm.classList.add('hidden')
       registerForm.classList.add('hidden')
 
@@ -116,7 +155,7 @@ function registerNewUser(e) {
 
       chatBox.classList.remove('hidden')
       footer.classList.remove('hidden')
-      chats.classList.remove('hidden')
+      aside.classList.remove('hidden')
       loginForm.classList.add('hidden')
       registerForm.classList.add('hidden')
 
