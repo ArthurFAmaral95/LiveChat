@@ -8,9 +8,12 @@ const registerForm = document.querySelector('.register-form')
 const userRegister = document.querySelector('input#user-register')
 const passwordRegister = document.querySelector('input#password-register')
 
+const chats = document.querySelector('aside')
+
 const chatBox = document.querySelector('.chat-box')
 const messageForm = document.querySelector('.message-form')
 const messageInput = document.querySelector('textarea')
+
 const footer = document.querySelector('footer')
 
 let user
@@ -59,6 +62,7 @@ function loginUser(e) {
 
       chatBox.classList.remove('hidden')
       footer.classList.remove('hidden')
+      chats.classList.remove('hidden')
       loginForm.classList.add('hidden')
       registerForm.classList.add('hidden')
 
@@ -109,6 +113,7 @@ function registerNewUser(e) {
 
       chatBox.classList.remove('hidden')
       footer.classList.remove('hidden')
+      chats.classList.remove('hidden')
       loginForm.classList.add('hidden')
       registerForm.classList.add('hidden')
 
