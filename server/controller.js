@@ -14,9 +14,11 @@ const registerUser = async (req, res) => {
     ])
     .into('users')
     .then(() => {
+      console.log(`${req.body.userName} registerd in DB successfully.`)
       res.send(`Welcome, ${req.body.userName}`)
     })
     .catch(err => {
+      console.log('Error at registering new user.')
       res.status(400).send(err)
     })
 }
@@ -28,6 +30,7 @@ const loginUser = async (req, res) => {
     .whereLike('user_name', `${req.body.userName}`)
     .then(user => {
       if (user.length === 0) {
+        console.log(`User ${req.body.userName} not found in DB.`)
         return res
           .status(400)
           .send({ error: 'user', message: 'User not found' })
@@ -35,14 +38,17 @@ const loginUser = async (req, res) => {
         user[0].password !==
         crypto.createHash('sha1').update(req.body.password).digest('hex')
       ) {
+        console.log('Wrong password.')
         return res
           .status(400)
           .send({ error: 'password', message: 'Wrong password' })
       } else {
+        console.log(`${req.body.userName} logged in.`)
         res.send(`Welcome, ${req.body.userName}`)
       }
     })
     .catch(err => {
+      console.log('Error at logging in.')
       res.json(err)
     })
 }
