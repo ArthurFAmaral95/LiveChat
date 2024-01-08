@@ -46,18 +46,42 @@ h1 {
   font-size: 3rem;
 }
 
-.user-form {
+legend {
+  font-size: 1.5rem;
+}
+
+.labels {
   display: flex;
   align-items: center;
-  width: 100%;
+  gap: 0.5rem;
 }
 
-.user-form label {
+span.error {
+  color: red;
+}
+
+.login-form,
+.register-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  gap: 1rem;
+  width: 100%;
+
+  margin-block: 2rem;
+}
+
+.login-form label,
+.register-form label {
   font-size: 1.5rem;
   margin-right: 0.5rem;
+
+  display: block;
 }
 
-.user-form input {
+.login-form input,
+.register-form input {
   width: 25rem;
 }
 
@@ -112,6 +136,8 @@ h1 {
   font-weight: 500;
 
   text-transform: capitalize;
+
+  color: navy;
 }
 
 .message-box .message-time {
@@ -128,11 +154,13 @@ h1 {
 }
 
 textarea,
-.user-form input {
+input {
+  padding: 0.5rem 1rem;
+}
+
+textarea {
   border-top-left-radius: 1rem;
   border-bottom-left-radius: 1rem;
-
-  padding: 0.5rem 1rem;
 
   height: 100%;
 }
@@ -140,10 +168,12 @@ textarea,
 button {
   cursor: pointer;
 
+  padding: 0.5rem 1rem;
+}
+
+.message-form button {
   border-top-right-radius: 1rem;
   border-bottom-right-radius: 1rem;
-
-  padding: 0.5rem 1rem;
 }
 
 .hidden {

@@ -6,7 +6,15 @@
 
     <link rel="stylesheet" href="./web/styles/chat.css" />
 
-    <script src="./web/form.js" type="module"></script>
+    <script type="importmap">
+      {
+        "imports": {
+          "axios": "https://cdn.jsdelivr.net/npm/axios@1.6.5/+esm"
+        }
+      }
+    </script>
+
+    <script type="module" src="./web/form.js"></script>
 
     <title>Chat</title>
   </head>
@@ -15,15 +23,59 @@
       <h1>Chat</h1>
     </header>
     <main>
-      <form class="user-form">
-        <label for="user">User:</label>
-        <input
-          type="text"
-          id="user"
-          name="user"
-          placeholder="Type here your name to start chating"
-        />
+      <form class="login-form">
+        <legend>If already registered, login below</legend>
+        <div>
+          <div class="labels user-login">
+            <label for="user-login">User:</label>
+          </div>
+          <input
+            type="text"
+            id="user-login"
+            name="user-login"
+            placeholder="Type here your name to start chating"
+            required
+          />
+        </div>
+        <div>
+          <div class="labels password-login">
+            <label for="password-login">Password:</label>
+          </div>
+          <input
+            type="password"
+            id="password-login"
+            placeholder="Password"
+            required
+          />
+        </div>
         <button>Login</button>
+      </form>
+      <form class="register-form">
+        <legend>If not registered, register below</legend>
+        <div>
+          <div class="labels user-register">
+            <label for="user-register">User:</label>
+          </div>
+          <input
+            type="text"
+            id="user-register"
+            name="user-register"
+            placeholder="Type here your name to register"
+            required
+          />
+        </div>
+        <div>
+          <div class="labels password-register">
+            <label for="password-register">Password:</label>
+          </div>
+          <input
+            type="password"
+            id="password-register"
+            placeholder="Password"
+            required
+          />
+        </div>
+        <button>Register</button>
       </form>
       <section class="chat-box hidden"></section>
     </main>

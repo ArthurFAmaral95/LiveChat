@@ -1,5 +1,12 @@
-const userForm = document.querySelector('.user-form')
-const userInput = document.querySelector('input#user')
+import axios from 'axios'
+
+const loginForm = document.querySelector('.login-form')
+const userLogin = document.querySelector('input#user-login')
+const passwordLogin = document.querySelector('input#password-login')
+
+const registerForm = document.querySelector('.register-form')
+const userRegister = document.querySelector('input#user-register')
+const passwordRegister = document.querySelector('input#password-register')
 
 const chatBox = document.querySelector('.chat-box')
 const messageForm = document.querySelector('.message-form')
@@ -39,15 +46,91 @@ function sendMessage(e) {
 
 function loginUser(e) {
   e.preventDefault()
-  if (userInput.value) {
-    user = userInput.value
 
-    chatBox.classList.remove('hidden')
-    footer.classList.remove('hidden')
-    userForm.classList.add('hidden')
+  axios
+    .post('http://localhost:3000/login', {
+      userName: userLogin.value,
+      password: passwordLogin.value
+    })
+    .then(response => {
+      console.log(response.data)
 
-    userForm.reset()
-  }
+      user = userLogin.value
+
+      chatBox.classList.remove('hidden')
+      footer.classList.remove('hidden')
+      loginForm.classList.add('hidden')
+      registerForm.classList.add('hidden')
+
+      loginForm.reset()
+    })
+    .catch(err => {
+      const errorMessages = document.querySelectorAll('span.error')
+      errorMessages.forEach(message => {
+        message.textContent = ''
+      })
+
+      if (err.response.data.error === 'user') {
+        const labels = document.querySelector('.labels.user-login')
+        const errorMessage = document.createElement('span')
+
+        errorMessage.classList.add('error')
+
+        errorMessage.textContent = err.response.data.message
+
+        labels.append(errorMessage)
+      } else if (err.response.data.error === 'password') {
+        const labels = document.querySelector('.labels.password-login')
+        const errorMessage = document.createElement('span')
+
+        errorMessage.classList.add('error')
+
+        errorMessage.textContent = err.response.data.message
+
+        labels.append(errorMessage)
+      } else {
+        console.error(err)
+      }
+    })
+}
+
+function registerNewUser(e) {
+  e.preventDefault()
+
+  axios
+    .post('http://localhost:3000/register', {
+      userName: userRegister.value,
+      password: passwordRegister.value
+    })
+    .then(response => {
+      console.log(response.data)
+
+      user = userRegister.value
+
+      chatBox.classList.remove('hidden')
+      footer.classList.remove('hidden')
+      loginForm.classList.add('hidden')
+      registerForm.classList.add('hidden')
+
+      registerForm.reset()
+    })
+    .catch(err => {
+      const errorMessages = document.querySelectorAll('span.error')
+      errorMessages.forEach(message => {
+        message.textContent = ''
+      })
+
+      if (err.response.data.errno === 19) {
+        const labels = document.querySelector('.labels.user-register')
+        const errorMessage = document.createElement('span')
+
+        errorMessage.classList.add('error')
+
+        errorMessage.textContent = 'User already registered'
+
+        labels.append(errorMessage)
+      }
+    })
 }
 
 socket.on('chat message', msg => {
@@ -77,7 +160,9 @@ socket.on('chat message', msg => {
   chatBox.scrollTo(0, chatBox.scrollHeight)
 })
 
-userForm.addEventListener('submit', loginUser)
+loginForm.addEventListener('submit', loginUser)
+
+registerForm.addEventListener('submit', registerNewUser)
 
 messageInput.addEventListener('keydown', e => {
   if (e.key === 'Enter' && !e.shiftKey) {
