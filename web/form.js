@@ -73,7 +73,8 @@ function loginUser(e) {
           if (chatUser.name !== user) {
             const chatDetails = {
               chatId: chat.chat_id,
-              otherUserInChat: chatUser.name
+              otherUserInChat: chatUser.name,
+              otherUserInChatId: chatUser.userId
             }
 
             userChatsData.push(chatDetails)
@@ -88,8 +89,9 @@ function loginUser(e) {
         const messageSpan = document.createElement('span')
 
         chatItem.classList.add('chat')
-        chatItem.setAttribute('data-chat-id', chat.chatId)
+        chatItem.setAttribute('data-chatid', chat.chatId)
         chatItem.setAttribute('data-receiver', chat.otherUserInChat)
+        chatItem.setAttribute('data-receiverid', chat.otherUserInChatId)
 
         userSpan.classList.add('user')
         messageSpan.classList.add('last-message')
@@ -109,6 +111,20 @@ function loginUser(e) {
       registerForm.classList.add('hidden')
 
       loginForm.reset()
+    })
+    .then(() => {
+      const chatListItem = document.querySelectorAll('li.chat')
+
+      chatListItem.forEach(item => {
+        item.addEventListener('click', () => {
+          const data = {
+            chatId: item.dataset.chatid,
+            messagesReceiver: item.dataset.receiver,
+            messagesReceiverId: item.dataset.receiverid
+          }
+          console.log(data)
+        })
+      })
     })
     .catch(err => {
       const errorMessages = document.querySelectorAll('span.error')
@@ -149,9 +165,10 @@ function registerNewUser(e) {
       password: passwordRegister.value
     })
     .then(response => {
-      console.log(response.data)
+      console.log(response.data.message)
 
       user = userRegister.value
+      userId = response.data.userId
 
       chatBox.classList.remove('hidden')
       footer.classList.remove('hidden')

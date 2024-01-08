@@ -14,9 +14,12 @@ const registerUser = async (req, res) => {
       }
     ])
     .into('users')
-    .then(() => {
+    .then(user => {
       console.log(`${req.body.userName} registerd in DB successfully.`)
-      res.send(`Welcome, ${req.body.userName}`)
+      res.send({
+        message: `Welcome, ${req.body.userName}`,
+        userId: user[0]
+      })
     })
     .catch(err => {
       console.log('Error at registering new user.')
@@ -27,6 +30,7 @@ const registerUser = async (req, res) => {
 const loginUser = async (req, res) => {
   let userId
   let chats
+  let loginError = false
   await knx
     .select('*')
     .from('users')
@@ -34,6 +38,7 @@ const loginUser = async (req, res) => {
     .then(user => {
       if (user.length === 0) {
         console.log(`User ${req.body.userName} not found in DB.`)
+        loginError = true
         return res
           .status(400)
           .send({ error: 'user', message: 'User not found' })
@@ -42,6 +47,7 @@ const loginUser = async (req, res) => {
         crypto.createHash('sha1').update(req.body.password).digest('hex')
       ) {
         console.log('Wrong password.')
+        loginError = true
         return res
           .status(400)
           .send({ error: 'password', message: 'Wrong password' })
@@ -51,27 +57,31 @@ const loginUser = async (req, res) => {
       }
     })
     .then(async () => {
-      await knx
-        .table('chats_users')
-        .join('users', 'chats_users.user_id', '=', 'users.user_id')
-        .join('chats', 'chats_users.chat_id', '=', 'chats.chat_id')
-        .select('users.user_name', 'chats_users.chat_id', 'chats.users')
-        .where('users.user_id', userId)
-        .then(data => {
-          chats = data
-        })
-        .catch(err => {
-          console.log(`Failed to retrieve chats from ${req.body.userName}`)
-          res.status(400).send(err)
-        })
+      if (!loginError) {
+        await knx
+          .table('chats_users')
+          .join('users', 'chats_users.user_id', '=', 'users.user_id')
+          .join('chats', 'chats_users.chat_id', '=', 'chats.chat_id')
+          .select('users.user_name', 'chats_users.chat_id', 'chats.users')
+          .where('users.user_id', userId)
+          .then(data => {
+            chats = data
+          })
+          .catch(err => {
+            console.log(`Failed to retrieve chats from ${req.body.userName}`)
+            res.status(400).send(err)
+          })
+      }
     })
     .then(() => {
-      res.send({
-        message: `Welcome, ${req.body.userName}`,
-        userId: userId,
-        userChats: chats
-      })
-      console.log(`${req.body.userName} logged in.`)
+      if (!loginError) {
+        res.send({
+          message: `Welcome, ${req.body.userName}`,
+          userId: userId,
+          userChats: chats
+        })
+        console.log(`${req.body.userName} logged in.`)
+      }
     })
     .catch(err => {
       console.log('Error at logging in.')
