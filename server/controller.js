@@ -1,4 +1,5 @@
 import { knx } from './db.js'
+
 const crypto = await import('crypto')
 
 const registerUser = async (req, res) => {
@@ -24,7 +25,9 @@ const registerUser = async (req, res) => {
 }
 
 const loginUser = async (req, res) => {
-  knx
+  let userId
+  let chats
+  await knx
     .select('*')
     .from('users')
     .whereLike('user_name', `${req.body.userName}`)
@@ -43,13 +46,37 @@ const loginUser = async (req, res) => {
           .status(400)
           .send({ error: 'password', message: 'Wrong password' })
       } else {
-        console.log(`${req.body.userName} logged in.`)
-        res.send(`Welcome, ${req.body.userName}`)
+        console.log(`${req.body.userName} found in DB.`)
+        userId = user[0].user_id
       }
+    })
+    .then(async () => {
+      await knx
+        .table('chats_users')
+        .join('users', 'chats_users.user_id', '=', 'users.user_id')
+        .join('chats', 'chats_users.chat_id', '=', 'chats.chat_id')
+        .select('users.user_name', 'chats_users.chat_id', 'chats.users')
+        .where('users.user_id', userId)
+        .then(data => {
+          chats = data
+        })
+        .catch(err => {
+          console.log(`Failed to retrieve chats from ${req.body.userName}`)
+          res.status(400).send(err)
+        })
+    })
+    .then(() => {
+      res.send({
+        message: `Welcome, ${req.body.userName}`,
+        userId: userId,
+        userChats: chats
+      })
+      console.log(`${req.body.userName} logged in.`)
     })
     .catch(err => {
       console.log('Error at logging in.')
-      res.json(err)
+      console.log(userId)
+      res.status(400).send(err)
     })
 }
 

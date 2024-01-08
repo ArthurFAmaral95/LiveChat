@@ -17,6 +17,7 @@ const messageInput = document.querySelector('textarea')
 const footer = document.querySelector('footer')
 
 let user
+let userId
 
 const socket = io()
 
@@ -56,10 +57,12 @@ function loginUser(e) {
       password: passwordLogin.value
     })
     .then(response => {
-      console.log(response.data)
+      console.log(response.data.message)
 
       user = userLogin.value
-
+      userId = response.data.userId
+    })
+    .then(() => {
       chatBox.classList.remove('hidden')
       footer.classList.remove('hidden')
       chats.classList.remove('hidden')
