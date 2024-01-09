@@ -94,7 +94,10 @@ const newChat = async (req, res) => {
   let overallError = false
   let userError = false
   let chatError = false
+
   const users = []
+
+  let newChatId
 
   for (const user of req.body.users) {
     await knx
@@ -162,7 +165,8 @@ const newChat = async (req, res) => {
         ])
         .into('chats')
         .then(chat => {
-          console.log(`Chat #${chat[0]} registerd in table "chat"`)
+          newChatId = chat[0]
+          console.log(`Chat #${chat[0]} registerd in table "chats"`)
           users.map(user => {
             knx
               .insert([
@@ -187,7 +191,14 @@ const newChat = async (req, res) => {
         })
         .then(() => {
           console.log('All data registered successfully.')
-          res.status(200).send({ message: 'New chat registered successfully!' })
+          res.status(200).send({
+            message: 'New chat registered successfully!',
+            chat: {
+              chatId: newChatId,
+              chatReceiver: users[1].name,
+              chatReceiverId: users[1].userId
+            }
+          })
         })
         .catch(err => {
           overallError = true

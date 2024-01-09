@@ -220,7 +220,26 @@ function starNewChat() {
     axios
       .post('http://localhost:3000/newChat', data)
       .then(response => {
-        console.log(response)
+        const chatItem = document.createElement('li')
+        const userSpan = document.createElement('span')
+        const messageSpan = document.createElement('span')
+
+        chatItem.classList.add('chat')
+        chatItem.setAttribute('data-chatid', response.data.chat.chatId)
+        chatItem.setAttribute('data-receiver', response.data.chat.chatReceiver)
+        chatItem.setAttribute(
+          'data-receiverid',
+          response.data.chat.chatReceiverId
+        )
+
+        userSpan.classList.add('user')
+        messageSpan.classList.add('last-message')
+
+        userSpan.textContent = response.data.chat.chatReceiver
+        messageSpan.textContent = 'last message'
+
+        chatItem.append(userSpan, messageSpan)
+        chats.append(chatItem)
       })
       .then(() => {
         square.classList.add('hidden')
@@ -235,15 +254,21 @@ function starNewChat() {
           message.remove()
         })
 
+        const labels = document.querySelector('.labels.new-chat')
+        const errorMessage = document.createElement('span')
+
+        errorMessage.classList.add('error')
+
         if (err.response.data.errno === 19) {
-          const labels = document.querySelector('.labels.new-chat')
-          const errorMessage = document.createElement('span')
-
-          errorMessage.classList.add('error')
-
           errorMessage.textContent = 'Chat already exists'
 
           labels.append(errorMessage)
+        } else if (err.response.data.error === 'user') {
+          errorMessage.textContent = err.response.data.message
+
+          labels.append(errorMessage)
+        } else {
+          console.error(err)
         }
       })
   })
