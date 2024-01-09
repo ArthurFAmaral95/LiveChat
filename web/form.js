@@ -59,13 +59,13 @@ function loginUser(e) {
 
   axios
     .post('http://localhost:3000/login', {
-      userName: userLogin.value,
+      userName: userLogin.value.toUpperCase(),
       password: passwordLogin.value
     })
     .then(response => {
       console.log(response.data.message)
 
-      user = userLogin.value
+      user = userLogin.value.toUpperCase()
       userId = response.data.userId
       rawUserChatsData = response.data.userChats
     })
@@ -99,7 +99,7 @@ function loginUser(e) {
         userSpan.classList.add('user')
         messageSpan.classList.add('last-message')
 
-        userSpan.textContent = chat.otherUserInChat
+        userSpan.textContent = chat.otherUserInChat.toLowerCase()
         messageSpan.textContent = 'last message'
 
         chatItem.append(userSpan, messageSpan)
@@ -165,13 +165,13 @@ function registerNewUser(e) {
 
   axios
     .post('http://localhost:3000/register', {
-      userName: userRegister.value,
+      userName: userRegister.value.toUpperCase(),
       password: passwordRegister.value
     })
     .then(response => {
       console.log(response.data.message)
 
-      user = userRegister.value
+      user = userRegister.value.toUpperCase()
       userId = response.data.userId
 
       chatBox.classList.remove('hidden')
@@ -211,7 +211,7 @@ function starNewChat() {
   newChatForm.addEventListener('submit', e => {
     e.preventDefault()
 
-    const usersOfNewChat = [user, newChatInput.value]
+    const usersOfNewChat = [user, newChatInput.value.toUpperCase()]
 
     const data = {
       users: usersOfNewChat
@@ -235,7 +235,7 @@ function starNewChat() {
         userSpan.classList.add('user')
         messageSpan.classList.add('last-message')
 
-        userSpan.textContent = response.data.chat.chatReceiver
+        userSpan.textContent = response.data.chat.chatReceiver.toLowerCase()
         messageSpan.textContent = 'last message'
 
         chatItem.append(userSpan, messageSpan)
@@ -289,7 +289,7 @@ socket.on('chat message', msg => {
     messageBox.classList.add('own-message')
   } else {
     messageBox.classList.add('outside-message')
-    messageUser.innerText = msg.user
+    messageUser.innerText = msg.user.toLowerCase()
   }
 
   messageTime.innerText = `${msg.msgHour}:${msg.msgMinutes}`
