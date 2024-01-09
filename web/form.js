@@ -9,6 +9,9 @@ const userRegister = document.querySelector('input#user-register')
 const passwordRegister = document.querySelector('input#password-register')
 
 const aside = document.querySelector('aside')
+const newChatBtn = document.querySelector('button#new-chat')
+const square = document.querySelector('div.square')
+const newChatForm = document.querySelector('form.new-chat-form')
 const chats = document.querySelector('ul.chats')
 
 const chatBox = document.querySelector('.chat-box')
@@ -107,6 +110,7 @@ function loginUser(e) {
       chatBox.classList.remove('hidden')
       footer.classList.remove('hidden')
       aside.classList.remove('hidden')
+      document.body.classList.remove('sidebar-hidden')
       loginForm.classList.add('hidden')
       registerForm.classList.add('hidden')
 
@@ -173,6 +177,7 @@ function registerNewUser(e) {
       chatBox.classList.remove('hidden')
       footer.classList.remove('hidden')
       aside.classList.remove('hidden')
+      document.body.classList.remove('sidebar-hidden')
       loginForm.classList.add('hidden')
       registerForm.classList.add('hidden')
 
@@ -195,6 +200,11 @@ function registerNewUser(e) {
         labels.append(errorMessage)
       }
     })
+}
+
+function starNewChat() {
+  square.classList.toggle('hidden')
+  newChatForm.classList.toggle('hidden')
 }
 
 socket.on('chat message', msg => {
@@ -243,3 +253,5 @@ document.addEventListener('keydown', e => {
     messageForm.dispatchEvent(new Event('submit'))
   }
 })
+
+newChatBtn.addEventListener('click', starNewChat)

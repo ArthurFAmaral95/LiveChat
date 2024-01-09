@@ -15,6 +15,9 @@ body {
 
   min-width: 58rem;
   min-height: 53rem;
+
+  max-width: 102.4rem;
+  margin-inline: auto;
 }
 body {
   padding: 1rem;
@@ -27,6 +30,12 @@ body {
 
   grid-template-rows: 5rem 80% 1fr;
   grid-template-columns: 20% 80%;
+
+  position: absolute;
+}
+
+body.sidebar-hidden {
+  grid-template-columns: 0% 100%;
 }
 
 header {
@@ -89,7 +98,8 @@ span.error {
 }
 
 .login-form label,
-.register-form label {
+.register-form label,
+.new-chat-form label {
   font-size: 1.5rem;
   margin-right: 0.5rem;
 
@@ -107,6 +117,42 @@ span.error {
   border-radius: 1rem;
 
   background-color: lightcyan;
+}
+
+.square {
+  height: 2rem;
+  width: 2rem;
+
+  background-color: white;
+
+  border-top: 1px solid black;
+  border-left: 1px solid black;
+
+  position: absolute;
+  left: calc(10% - 0.4rem);
+  top: 9.5rem;
+  transform: rotate(45deg);
+  z-index: 2;
+}
+
+.new-chat-form {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+
+  width: 16%;
+
+  padding: 1rem;
+
+  border: 1px solid black;
+  border-radius: 1rem;
+
+  background-color: white;
+
+  position: absolute;
+  left: calc(2% + 0.4rem);
+  top: 10.5rem;
 }
 
 .chats .chat {
@@ -211,10 +257,26 @@ textarea {
   height: 100%;
 }
 
+input#new-chat-user {
+  width: 100%;
+
+  border-radius: 1rem;
+}
+
+input#new-chat-user::placeholder {
+  font-size: 1rem;
+}
+
 button {
   cursor: pointer;
 
   padding: 0.5rem 1rem;
+}
+
+button#start-new-chat {
+  width: 100%;
+
+  border-radius: 1rem;
 }
 
 .message-form button {
