@@ -133,7 +133,7 @@ function loginUser(e) {
     .catch(err => {
       const errorMessages = document.querySelectorAll('span.error')
       errorMessages.forEach(message => {
-        message.textContent = ''
+        message.remove()
       })
 
       if (err.response.data.error === 'user') {
@@ -186,7 +186,7 @@ function registerNewUser(e) {
     .catch(err => {
       const errorMessages = document.querySelectorAll('span.error')
       errorMessages.forEach(message => {
-        message.textContent = ''
+        message.remove()
       })
 
       if (err.response.data.errno === 19) {
@@ -205,6 +205,48 @@ function registerNewUser(e) {
 function starNewChat() {
   square.classList.toggle('hidden')
   newChatForm.classList.toggle('hidden')
+
+  const newChatInput = document.querySelector('input#new-chat-user')
+
+  newChatForm.addEventListener('submit', e => {
+    e.preventDefault()
+
+    const usersOfNewChat = [user, newChatInput.value]
+
+    const data = {
+      users: usersOfNewChat
+    }
+
+    axios
+      .post('http://localhost:3000/newChat', data)
+      .then(response => {
+        console.log(response)
+      })
+      .then(() => {
+        square.classList.add('hidden')
+        newChatForm.classList.add('hidden')
+
+        newChatForm.reset()
+      })
+      .catch(err => {
+        const errorMessages = document.querySelectorAll('span.error')
+
+        errorMessages.forEach(message => {
+          message.remove()
+        })
+
+        if (err.response.data.errno === 19) {
+          const labels = document.querySelector('.labels.new-chat')
+          const errorMessage = document.createElement('span')
+
+          errorMessage.classList.add('error')
+
+          errorMessage.textContent = 'Chat already exists'
+
+          labels.append(errorMessage)
+        }
+      })
+  })
 }
 
 socket.on('chat message', msg => {
