@@ -209,4 +209,30 @@ const newChat = async (req, res) => {
   }
 }
 
-export { registerUser, loginUser, newChat }
+const sendMessage = async (req, res) => {
+  knx
+    .insert([
+      {
+        chat_id: req.body.chatId,
+        sender_user_id: req.body.sender,
+        receiver_user_id: req.body.receiver,
+        message_time: req.body.time,
+        message_content: req.body.content
+      }
+    ])
+    .into('messages')
+    .then(response => {
+      console.log(
+        `User ${req.body.sender} sent a message to ${req.body.receiver}. Message #${response[0]}`
+      )
+      res.status(200).send({ message: 'Message deliverd.' })
+    })
+    .catch(() => {
+      res.status(400).send({
+        error: 'message delivery error',
+        message: 'Unable to deliver message.'
+      })
+    })
+}
+
+export { registerUser, loginUser, newChat, sendMessage }
