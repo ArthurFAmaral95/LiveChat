@@ -28,9 +28,9 @@ io.on('connection', socket => {
     console.log(`user #${user} connected on socket ${socket.id}`)
   })
 
-  socket.on('chat message', (msg, receiver) => {
+  socket.on('chat message', (msg, receiver, chat) => {
     const receiverId = Number(receiver)
-    io.to(receiverId).to(socket.id).emit('chat message', msg)
+    io.to(receiverId).to(socket.id).emit('chat message',  msg, chat )
   })
 
   socket.on('disconnect', () => {

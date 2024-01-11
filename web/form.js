@@ -33,7 +33,7 @@ const socket = io()
 function sendMessage(e) {
   e.preventDefault()
 
-  if (messageInput.value) {
+  if (messageInput.value && currentChat) {
     const date = new Date()
     const hour = date.getHours()
     let minutes
@@ -60,7 +60,7 @@ function sendMessage(e) {
         content: JSON.stringify(messageInput.value)
       })
       .then(() => {
-        socket.emit('chat message', message, receiverId)
+        socket.emit('chat message', message, receiverId, currentChat)
       })
       .catch(err => {
         console.error(err)
@@ -141,6 +141,12 @@ function loginUser(e) {
       chatListItem.forEach(item => {
         item.addEventListener('click', () => {
           updateCurrentChat(item.dataset.chatid, item.dataset.receiverid)
+
+          chatListItem.forEach(item => {
+            item.classList.remove('selected')
+          })
+
+          item.classList.add('selected')
         })
       })
     })
@@ -291,35 +297,35 @@ function starNewChat() {
 function updateCurrentChat(chatId, receiver) {
   currentChat = chatId
   receiverId = receiver
-
-  console.log({ currentChat, receiverId })
 }
 
-socket.on('chat message', msg => {
-  const messageBox = document.createElement('div')
-  const messageUser = document.createElement('span')
-  const messageTime = document.createElement('span')
-  const messageText = document.createElement('span')
+socket.on('chat message', (msg, chat) => {
+  if (chat == currentChat) {
+    const messageBox = document.createElement('div')
+    const messageUser = document.createElement('span')
+    const messageTime = document.createElement('span')
+    const messageText = document.createElement('span')
 
-  messageBox.classList.add('message-box')
-  messageUser.classList.add('message-user')
-  messageTime.classList.add('message-time')
-  messageText.classList.add('message-text')
+    messageBox.classList.add('message-box')
+    messageUser.classList.add('message-user')
+    messageTime.classList.add('message-time')
+    messageText.classList.add('message-text')
 
-  if (msg.user === user) {
-    messageBox.classList.add('own-message')
-  } else {
-    messageBox.classList.add('outside-message')
-    messageUser.innerText = msg.user.toLowerCase()
+    if (msg.user === user) {
+      messageBox.classList.add('own-message')
+    } else {
+      messageBox.classList.add('outside-message')
+      messageUser.innerText = msg.user.toLowerCase()
+    }
+
+    messageTime.innerText = `${msg.msgHour}:${msg.msgMinutes}`
+    messageText.innerText = msg.msgText
+
+    messageBox.append(messageUser, messageText, messageTime)
+    chatBox.append(messageBox)
+
+    chatBox.scrollTo(0, chatBox.scrollHeight)
   }
-
-  messageTime.innerText = `${msg.msgHour}:${msg.msgMinutes}`
-  messageText.innerText = msg.msgText
-
-  messageBox.append(messageUser, messageText, messageTime)
-  chatBox.append(messageBox)
-
-  chatBox.scrollTo(0, chatBox.scrollHeight)
 })
 
 loginForm.addEventListener('submit', loginUser)

@@ -170,6 +170,10 @@ span.error {
   cursor: pointer;
 }
 
+.chats .chat.selected{
+  background-color: lightpink;
+}
+
 .chats .chat .user {
   font-size: 1.4rem;
   font-weight: 700;
