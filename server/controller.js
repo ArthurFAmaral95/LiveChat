@@ -235,4 +235,22 @@ const sendMessage = async (req, res) => {
     })
 }
 
-export { registerUser, loginUser, newChat, sendMessage }
+const fetchChatMessages = async (req, res) => {
+  knx.select(
+    'sender_user_id',
+    'receiver_user_id',
+    'message_time',
+    'message_content'
+  )
+  .from('messages')
+    .where('chat_id', req.body.chatId)
+    .then(messages => {
+      console.log(`Messages from chat ${req.body.chatId} fetched`)
+      res.status(200).send(messages)
+    })
+    .catch(err => {
+      res.send(err)
+    })
+}
+
+export { registerUser, loginUser, newChat, sendMessage, fetchChatMessages }

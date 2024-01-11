@@ -299,6 +299,8 @@ function updateCurrentChat(chatId, receiver) {
   receiverId = receiver
 }
 
+function fetchMessages(){}
+
 socket.on('chat message', (msg, chat) => {
   if (chat == currentChat) {
     const messageBox = document.createElement('div')

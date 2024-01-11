@@ -12,4 +12,6 @@ router.post('/newChat', routes.newChat)
 
 router.post('/newMessage', routes.sendMessage)
 
+router.post('/fetchMessages', routes.fetchChatMessages)
+
 export { router }
