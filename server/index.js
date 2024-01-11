@@ -22,10 +22,15 @@ app.get('/', (req, res) => {
 app.use('/', router)
 
 io.on('connection', socket => {
-  console.log('a user connected')
+  socket.on('login', user => {
+    socket.join(user)
 
-  socket.on('chat message', msg => {
-    io.emit('chat message', msg)
+    console.log(`user #${user} connected on socket ${socket.id}`)
+  })
+
+  socket.on('chat message', (msg, receiver) => {
+    const receiverId = Number(receiver)
+    io.to(receiverId).to(socket.id).emit('chat message', msg)
   })
 
   socket.on('disconnect', () => {

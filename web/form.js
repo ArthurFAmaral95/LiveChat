@@ -60,7 +60,7 @@ function sendMessage(e) {
         content: JSON.stringify(messageInput.value)
       })
       .then(() => {
-        socket.emit('chat message', message)
+        socket.emit('chat message', message, receiverId)
       })
       .catch(err => {
         console.error(err)
@@ -131,6 +131,9 @@ function loginUser(e) {
       registerForm.classList.add('hidden')
 
       loginForm.reset()
+    })
+    .then(() => {
+      socket.emit('login', userId)
     })
     .then(() => {
       const chatListItem = document.querySelectorAll('li.chat')
@@ -288,6 +291,8 @@ function starNewChat() {
 function updateCurrentChat(chatId, receiver) {
   currentChat = chatId
   receiverId = receiver
+
+  console.log({ currentChat, receiverId })
 }
 
 socket.on('chat message', msg => {
