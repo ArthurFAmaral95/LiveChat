@@ -25,6 +25,9 @@ let userId
 let rawUserChatsData
 const userChatsData = []
 
+let currentChat
+let receiverId
+
 const socket = io()
 
 function sendMessage(e) {
@@ -48,7 +51,20 @@ function sendMessage(e) {
       user: user
     }
 
-    socket.emit('chat message', message)
+    axios
+      .post('http://localhost:3000/newMessage', {
+        chatId: currentChat,
+        sender: userId,
+        receiver: receiverId,
+        time: date,
+        content: JSON.stringify(messageInput.value)
+      })
+      .then(() => {
+        socket.emit('chat message', message)
+      })
+      .catch(err => {
+        console.error(err)
+      })
 
     messageForm.reset()
   }
@@ -121,12 +137,7 @@ function loginUser(e) {
 
       chatListItem.forEach(item => {
         item.addEventListener('click', () => {
-          const data = {
-            chatId: item.dataset.chatid,
-            messagesReceiver: item.dataset.receiver,
-            messagesReceiverId: item.dataset.receiverid
-          }
-          console.log(data)
+          updateCurrentChat(item.dataset.chatid, item.dataset.receiverid)
         })
       })
     })
@@ -272,6 +283,11 @@ function starNewChat() {
         }
       })
   })
+}
+
+function updateCurrentChat(chatId, receiver) {
+  currentChat = chatId
+  receiverId = receiver
 }
 
 socket.on('chat message', msg => {
