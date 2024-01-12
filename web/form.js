@@ -147,6 +147,7 @@ function loginUser(e) {
           })
 
           item.classList.add('selected')
+          fetchMessages(item.dataset.chatid)
         })
       })
     })
@@ -299,7 +300,55 @@ function updateCurrentChat(chatId, receiver) {
   receiverId = receiver
 }
 
-function fetchMessages(){}
+function fetchMessages(chatId) {
+  axios
+    .post('http://localhost:3000/fetchMessages', {
+      chatId: chatId
+    })
+    .then(messages => {
+      const messageArray = messages.data
+
+      messageArray.map(message => {
+        const messageBox = document.createElement('div')
+        const messageUser = document.createElement('span')
+        const messageTime = document.createElement('span')
+        const messageText = document.createElement('span')
+
+        messageBox.classList.add('message-box')
+        messageUser.classList.add('message-user')
+        messageTime.classList.add('message-time')
+        messageText.classList.add('message-text')
+
+        if (message.sender_user_id === userId) {
+          messageBox.classList.add('own-message')
+        } else {
+          messageBox.classList.add('outside-message')
+          messageUser.innerText = message.sender_name.toLowerCase()
+        }
+
+        const dateTimeZone = new Date(message.message_time)
+        const messageHours = dateTimeZone.getHours()
+        let messageMinutes
+
+        if (dateTimeZone.getMinutes() < 10) {
+          messageMinutes = `0${dateTimeZone.getMinutes()}`
+        } else {
+          messageMinutes = dateTimeZone.getMinutes()
+        }
+
+        messageTime.innerText = `${messageHours}:${messageMinutes}`
+        messageText.innerText = JSON.parse(message.message_content)
+
+        messageBox.append(messageUser, messageText, messageTime)
+        chatBox.append(messageBox)
+
+        chatBox.scrollTo(0, chatBox.scrollHeight)
+      })
+    })
+    .catch(err => {
+      console.error(err)
+    })
+}
 
 socket.on('chat message', (msg, chat) => {
   if (chat == currentChat) {

@@ -236,14 +236,17 @@ const sendMessage = async (req, res) => {
 }
 
 const fetchChatMessages = async (req, res) => {
-  knx.select(
-    'sender_user_id',
-    'receiver_user_id',
-    'message_time',
-    'message_content'
-  )
-  .from('messages')
-    .where('chat_id', req.body.chatId)
+  knx
+    .table('messages')
+    .join('users', 'messages.sender_user_id', '=', 'users.user_id')
+    .select(
+      'messages.sender_user_id',
+      'messages.receiver_user_id',
+      'users.user_name as sender_name',
+      'messages.message_time',
+      'messages.message_content'
+    )
+    .where('messages.chat_id', req.body.chatId)
     .then(messages => {
       console.log(`Messages from chat ${req.body.chatId} fetched`)
       res.status(200).send(messages)
