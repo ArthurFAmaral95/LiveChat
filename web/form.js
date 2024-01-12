@@ -306,6 +306,11 @@ function fetchMessages(chatId) {
       chatId: chatId
     })
     .then(messages => {
+      const allMessagesBoxes = document.querySelectorAll('div.message-box')
+      allMessagesBoxes.forEach(box => {
+        box.remove()
+      })
+
       const messageArray = messages.data
 
       messageArray.map(message => {
