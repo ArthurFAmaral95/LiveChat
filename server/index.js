@@ -30,7 +30,7 @@ io.on('connection', socket => {
 
   socket.on('chat message', (msg, receiver, chat) => {
     const receiverId = Number(receiver)
-    io.to(receiverId).to(socket.id).emit('chat message',  msg, chat )
+    io.to(receiverId).to(socket.id).emit('chat message', msg, chat)
   })
 
   socket.on('disconnect', () => {

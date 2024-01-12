@@ -170,7 +170,7 @@ span.error {
   cursor: pointer;
 }
 
-.chats .chat.selected{
+.chats .chat.selected {
   background-color: lightpink;
 }
 
@@ -182,6 +182,9 @@ span.error {
 
 .chats .chat .last-message {
   font-weight: 200;
+
+  overflow: hidden;
+  text-wrap: nowrap;
 }
 
 .chat-box {

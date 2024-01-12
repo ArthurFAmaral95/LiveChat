@@ -103,23 +103,55 @@ function loginUser(e) {
     })
     .then(() => {
       userChatsData.map(chat => {
-        const chatItem = document.createElement('li')
-        const userSpan = document.createElement('span')
-        const messageSpan = document.createElement('span')
+        let lastMessage
 
-        chatItem.classList.add('chat')
-        chatItem.setAttribute('data-chatid', chat.chatId)
-        chatItem.setAttribute('data-receiver', chat.otherUserInChat)
-        chatItem.setAttribute('data-receiverid', chat.otherUserInChatId)
+        axios
+          .post('http://localhost:3000/fetchMessages', {
+            chatId: chat.chatId
+          })
+          .then(response => {
+            lastMessage = JSON.parse(
+              response.data[response.data.length - 1].message_content
+            )
+          })
+          .then(() => {
+            const chatItem = document.createElement('li')
+            const userSpan = document.createElement('span')
+            const messageSpan = document.createElement('span')
 
-        userSpan.classList.add('user')
-        messageSpan.classList.add('last-message')
+            chatItem.classList.add('chat')
+            chatItem.setAttribute('data-chatid', chat.chatId)
+            chatItem.setAttribute('data-receiver', chat.otherUserInChat)
+            chatItem.setAttribute('data-receiverid', chat.otherUserInChatId)
 
-        userSpan.textContent = chat.otherUserInChat.toLowerCase()
-        messageSpan.textContent = 'last message'
+            userSpan.classList.add('user')
+            messageSpan.classList.add('last-message')
 
-        chatItem.append(userSpan, messageSpan)
-        chats.append(chatItem)
+            userSpan.textContent = chat.otherUserInChat.toLowerCase()
+            messageSpan.textContent = lastMessage
+
+            chatItem.append(userSpan, messageSpan)
+            chats.append(chatItem)
+          })
+          .then(() => {
+            const chatListItem = document.querySelectorAll('li.chat')
+
+            chatListItem.forEach(item => {
+              item.addEventListener('click', () => {
+                updateCurrentChat(item.dataset.chatid, item.dataset.receiverid)
+
+                chatListItem.forEach(item => {
+                  item.classList.remove('selected')
+                })
+
+                item.classList.add('selected')
+                fetchMessages(item.dataset.chatid)
+              })
+            })
+          })
+          .catch(err => {
+            console.error(err)
+          })
       })
     })
     .then(() => {
@@ -134,22 +166,6 @@ function loginUser(e) {
     })
     .then(() => {
       socket.emit('login', userId)
-    })
-    .then(() => {
-      const chatListItem = document.querySelectorAll('li.chat')
-
-      chatListItem.forEach(item => {
-        item.addEventListener('click', () => {
-          updateCurrentChat(item.dataset.chatid, item.dataset.receiverid)
-
-          chatListItem.forEach(item => {
-            item.classList.remove('selected')
-          })
-
-          item.classList.add('selected')
-          fetchMessages(item.dataset.chatid)
-        })
-      })
     })
     .catch(err => {
       const errorMessages = document.querySelectorAll('span.error')
@@ -355,7 +371,19 @@ function fetchMessages(chatId) {
     })
 }
 
+function updateLastMessage(chatId, message) {
+  const lastMessageSpan = document.querySelector(
+    `li.chat[data-chatid="${chatId}"] .last-message`
+  )
+
+  lastMessageSpan.textContent = message
+
+  console.log(chatId, message)
+}
+
 socket.on('chat message', (msg, chat) => {
+  updateLastMessage(chat, msg.msgText)
+
   if (chat == currentChat) {
     const messageBox = document.createElement('div')
     const messageUser = document.createElement('span')
