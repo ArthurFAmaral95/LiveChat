@@ -118,19 +118,26 @@ function loginUser(e) {
             const chatItem = document.createElement('li')
             const userSpan = document.createElement('span')
             const messageSpan = document.createElement('span')
+            const container = document.createElement('div')
+            const newMessagesCount = document.createElement('span')
 
             chatItem.classList.add('chat')
             chatItem.setAttribute('data-chatid', chat.chatId)
             chatItem.setAttribute('data-receiver', chat.otherUserInChat)
             chatItem.setAttribute('data-receiverid', chat.otherUserInChatId)
+            newMessagesCount.classList.add('count')
+            newMessagesCount.classList.add('hidden')
+            container.classList.add('container')
 
             userSpan.classList.add('user')
             messageSpan.classList.add('last-message')
 
             userSpan.textContent = chat.otherUserInChat.toLowerCase()
             messageSpan.textContent = lastMessage
+            newMessagesCount.value = 0
 
-            chatItem.append(userSpan, messageSpan)
+            container.append(userSpan, messageSpan)
+            chatItem.append(container, newMessagesCount)
             chats.append(chatItem)
           })
           .then(() => {
@@ -138,6 +145,9 @@ function loginUser(e) {
 
             chatListItem.forEach(item => {
               item.addEventListener('click', () => {
+                const newMessageCountSpan = document.querySelector(
+                  `li.chat[data-chatid="${item.dataset.chatid}"] .count`
+                )
                 updateCurrentChat(item.dataset.chatid, item.dataset.receiverid)
 
                 chatListItem.forEach(item => {
@@ -146,6 +156,9 @@ function loginUser(e) {
 
                 item.classList.add('selected')
                 fetchMessages(item.dataset.chatid)
+
+                newMessageCountSpan.value = 0
+                newMessageCountSpan.classList.add('hidden')
               })
             })
           })
@@ -372,13 +385,22 @@ function fetchMessages(chatId) {
 }
 
 function updateLastMessage(chatId, message) {
+  const chatLi = document.querySelector(`li.chat[data-chatid="${chatId}"] `)
+
   const lastMessageSpan = document.querySelector(
     `li.chat[data-chatid="${chatId}"] .last-message`
   )
 
-  lastMessageSpan.textContent = message
+  const newMessageCountSpan = document.querySelector(
+    `li.chat[data-chatid="${chatId}"] .count`
+  )
 
-  console.log(chatId, message)
+  if (!chatLi.classList.contains('selected')) {
+    newMessageCountSpan.textContent = ++newMessageCountSpan.value
+    newMessageCountSpan.classList.remove('hidden')
+  }
+
+  lastMessageSpan.textContent = message
 }
 
 socket.on('chat message', (msg, chat) => {
