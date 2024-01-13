@@ -110,9 +110,11 @@ function loginUser(e) {
             chatId: chat.chatId
           })
           .then(response => {
-            lastMessage = JSON.parse(
-              response.data[response.data.length - 1].message_content
-            )
+            if (response.data.length > 0) {
+              lastMessage = JSON.parse(
+                response.data[response.data.length - 1].message_content
+              )
+            }
           })
           .then(() => {
             const chatItem = document.createElement('li')
@@ -273,6 +275,8 @@ function starNewChat() {
         const chatItem = document.createElement('li')
         const userSpan = document.createElement('span')
         const messageSpan = document.createElement('span')
+        const container = document.createElement('div')
+        const newMessagesCount = document.createElement('span')
 
         chatItem.classList.add('chat')
         chatItem.setAttribute('data-chatid', response.data.chat.chatId)
@@ -281,15 +285,42 @@ function starNewChat() {
           'data-receiverid',
           response.data.chat.chatReceiverId
         )
+        newMessagesCount.classList.add('count')
+        newMessagesCount.classList.add('hidden')
+        container.classList.add('container')
 
         userSpan.classList.add('user')
         messageSpan.classList.add('last-message')
 
         userSpan.textContent = response.data.chat.chatReceiver.toLowerCase()
-        messageSpan.textContent = 'last message'
+        messageSpan.textContent = ''
+        newMessagesCount.value = 0
 
-        chatItem.append(userSpan, messageSpan)
+        container.append(userSpan, messageSpan)
+        chatItem.append(container, newMessagesCount)
         chats.append(chatItem)
+      })
+      .then(() => {
+        const chatListItem = document.querySelectorAll('li.chat')
+
+        chatListItem.forEach(item => {
+          item.addEventListener('click', () => {
+            const newMessageCountSpan = document.querySelector(
+              `li.chat[data-chatid="${item.dataset.chatid}"] .count`
+            )
+            updateCurrentChat(item.dataset.chatid, item.dataset.receiverid)
+
+            chatListItem.forEach(item => {
+              item.classList.remove('selected')
+            })
+
+            item.classList.add('selected')
+            fetchMessages(item.dataset.chatid)
+
+            newMessageCountSpan.value = 0
+            newMessageCountSpan.classList.add('hidden')
+          })
+        })
       })
       .then(() => {
         square.classList.add('hidden')
