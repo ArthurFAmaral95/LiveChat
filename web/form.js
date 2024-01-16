@@ -48,7 +48,8 @@ function sendMessage(e) {
       msgHour: hour,
       msgMinutes: minutes,
       msgText: messageInput.value,
-      user: user
+      user: user,
+      userId: userId
     }
 
     axios
@@ -116,53 +117,12 @@ function loginUser(e) {
               )
             }
           })
-          .then(() => {
-            const chatItem = document.createElement('li')
-            const userSpan = document.createElement('span')
-            const messageSpan = document.createElement('span')
-            const container = document.createElement('div')
-            const newMessagesCount = document.createElement('span')
-
-            chatItem.classList.add('chat')
-            chatItem.setAttribute('data-chatid', chat.chatId)
-            chatItem.setAttribute('data-receiver', chat.otherUserInChat)
-            chatItem.setAttribute('data-receiverid', chat.otherUserInChatId)
-            newMessagesCount.classList.add('count')
-            newMessagesCount.classList.add('hidden')
-            container.classList.add('container')
-
-            userSpan.classList.add('user')
-            messageSpan.classList.add('last-message')
-
-            userSpan.textContent = chat.otherUserInChat.toLowerCase()
-            messageSpan.textContent = lastMessage
-            newMessagesCount.value = 0
-
-            container.append(userSpan, messageSpan)
-            chatItem.append(container, newMessagesCount)
-            chats.append(chatItem)
-          })
-          .then(() => {
-            const chatListItem = document.querySelectorAll('li.chat')
-
-            chatListItem.forEach(item => {
-              item.addEventListener('click', () => {
-                const newMessageCountSpan = document.querySelector(
-                  `li.chat[data-chatid="${item.dataset.chatid}"] .count`
-                )
-                updateCurrentChat(item.dataset.chatid, item.dataset.receiverid)
-
-                chatListItem.forEach(item => {
-                  item.classList.remove('selected')
-                })
-
-                item.classList.add('selected')
-                fetchMessages(item.dataset.chatid)
-
-                newMessageCountSpan.value = 0
-                newMessageCountSpan.classList.add('hidden')
-              })
-            })
+          .then(() => {            renderChatList(
+              chat.chatId,
+              chat.otherUserInChat,
+              chat.otherUserInChatId,
+              lastMessage
+            )
           })
           .catch(err => {
             console.error(err)
@@ -235,6 +195,9 @@ function registerNewUser(e) {
 
       registerForm.reset()
     })
+    .then(() => {
+      socket.emit('login', userId)
+    })
     .catch(err => {
       const errorMessages = document.querySelectorAll('span.error')
       errorMessages.forEach(message => {
@@ -272,55 +235,13 @@ function starNewChat() {
     axios
       .post('http://localhost:3000/newChat', data)
       .then(response => {
-        const chatItem = document.createElement('li')
-        const userSpan = document.createElement('span')
-        const messageSpan = document.createElement('span')
-        const container = document.createElement('div')
-        const newMessagesCount = document.createElement('span')
-
-        chatItem.classList.add('chat')
-        chatItem.setAttribute('data-chatid', response.data.chat.chatId)
-        chatItem.setAttribute('data-receiver', response.data.chat.chatReceiver)
-        chatItem.setAttribute(
-          'data-receiverid',
-          response.data.chat.chatReceiverId
+        const firstMessage = ''
+        renderChatList(
+          response.data.chat.chatId,
+          response.data.chat.chatReceiver,
+          response.data.chat.chatReceiverId,
+          firstMessage
         )
-        newMessagesCount.classList.add('count')
-        newMessagesCount.classList.add('hidden')
-        container.classList.add('container')
-
-        userSpan.classList.add('user')
-        messageSpan.classList.add('last-message')
-
-        userSpan.textContent = response.data.chat.chatReceiver.toLowerCase()
-        messageSpan.textContent = ''
-        newMessagesCount.value = 0
-
-        container.append(userSpan, messageSpan)
-        chatItem.append(container, newMessagesCount)
-        chats.append(chatItem)
-      })
-      .then(() => {
-        const chatListItem = document.querySelectorAll('li.chat')
-
-        chatListItem.forEach(item => {
-          item.addEventListener('click', () => {
-            const newMessageCountSpan = document.querySelector(
-              `li.chat[data-chatid="${item.dataset.chatid}"] .count`
-            )
-            updateCurrentChat(item.dataset.chatid, item.dataset.receiverid)
-
-            chatListItem.forEach(item => {
-              item.classList.remove('selected')
-            })
-
-            item.classList.add('selected')
-            fetchMessages(item.dataset.chatid)
-
-            newMessageCountSpan.value = 0
-            newMessageCountSpan.classList.add('hidden')
-          })
-        })
       })
       .then(() => {
         square.classList.add('hidden')
@@ -434,7 +355,67 @@ function updateLastMessage(chatId, message) {
   lastMessageSpan.textContent = message
 }
 
+function renderChatList(chatId, receiver, receiverId, message) {
+  const chatItem = document.createElement('li')
+  const userSpan = document.createElement('span')
+  const messageSpan = document.createElement('span')
+  const container = document.createElement('div')
+  const newMessagesCount = document.createElement('span')
+
+  chatItem.classList.add('chat')
+  chatItem.setAttribute('data-chatid', chatId)
+  chatItem.setAttribute('data-receiver', receiver)
+  chatItem.setAttribute('data-receiverid', receiverId)
+  newMessagesCount.classList.add('count')
+  newMessagesCount.classList.add('hidden')
+  container.classList.add('container')
+
+  userSpan.classList.add('user')
+  messageSpan.classList.add('last-message')
+
+  userSpan.textContent = receiver.toLowerCase()
+  messageSpan.textContent = message
+  newMessagesCount.value = 0
+
+  container.append(userSpan, messageSpan)
+  chatItem.append(container, newMessagesCount)
+  chats.append(chatItem)
+
+  const chatListItems = document.querySelectorAll('li.chat')
+
+  chatListItems.forEach(item => {
+    item.addEventListener('click', () => {
+      const newMessageCountSpan = document.querySelector(
+        `li.chat[data-chatid="${item.dataset.chatid}"] .count`
+      )
+      updateCurrentChat(item.dataset.chatid, item.dataset.receiverid)
+
+      chatListItems.forEach(item => {
+        item.classList.remove('selected')
+      })
+
+      item.classList.add('selected')
+      fetchMessages(item.dataset.chatid)
+
+      newMessageCountSpan.value = 0
+      newMessageCountSpan.classList.add('hidden')
+    })
+  })
+}
+
 socket.on('chat message', (msg, chat) => {
+  const chatListItems = document.querySelectorAll('li.chat')
+
+  const chatsId = []
+
+  chatListItems.forEach(item => {
+    chatsId.push(item.dataset.chatid)
+  })
+
+  if (!chatsId.includes(chat)) {
+    renderChatList(chat, msg.user, msg.userId, msg.msgText)
+  }
+
   updateLastMessage(chat, msg.msgText)
 
   if (chat == currentChat) {

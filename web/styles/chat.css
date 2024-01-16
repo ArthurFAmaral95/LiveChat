@@ -213,6 +213,8 @@ span.error {
 
   overflow: hidden;
   text-wrap: nowrap;
+
+  max-width: 10rem;
 }
 
 .chat-box {
