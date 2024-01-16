@@ -35,18 +35,9 @@ function sendMessage(e) {
 
   if (messageInput.value && currentChat) {
     const date = new Date()
-    const hour = date.getHours()
-    let minutes
-
-    if (date.getMinutes() < 10) {
-      minutes = `0${date.getMinutes()}`
-    } else {
-      minutes = date.getMinutes()
-    }
 
     const message = {
-      msgHour: hour,
-      msgMinutes: minutes,
+      date: date,
       msgText: messageInput.value,
       user: user,
       userId: userId
@@ -117,7 +108,8 @@ function loginUser(e) {
               )
             }
           })
-          .then(() => {            renderChatList(
+          .then(() => {
+            renderChatList(
               chat.chatId,
               chat.otherUserInChat,
               chat.otherUserInChatId,
@@ -295,40 +287,12 @@ function fetchMessages(chatId) {
       const messageArray = messages.data
 
       messageArray.map(message => {
-        const messageBox = document.createElement('div')
-        const messageUser = document.createElement('span')
-        const messageTime = document.createElement('span')
-        const messageText = document.createElement('span')
-
-        messageBox.classList.add('message-box')
-        messageUser.classList.add('message-user')
-        messageTime.classList.add('message-time')
-        messageText.classList.add('message-text')
-
-        if (message.sender_user_id === userId) {
-          messageBox.classList.add('own-message')
-        } else {
-          messageBox.classList.add('outside-message')
-          messageUser.innerText = message.sender_name.toLowerCase()
-        }
-
-        const dateTimeZone = new Date(message.message_time)
-        const messageHours = dateTimeZone.getHours()
-        let messageMinutes
-
-        if (dateTimeZone.getMinutes() < 10) {
-          messageMinutes = `0${dateTimeZone.getMinutes()}`
-        } else {
-          messageMinutes = dateTimeZone.getMinutes()
-        }
-
-        messageTime.innerText = `${messageHours}:${messageMinutes}`
-        messageText.innerText = JSON.parse(message.message_content)
-
-        messageBox.append(messageUser, messageText, messageTime)
-        chatBox.append(messageBox)
-
-        chatBox.scrollTo(0, chatBox.scrollHeight)
+        renderMessages(
+          message.sender_user_id,
+          message.sender_name,
+          message.message_time,
+          JSON.parse(message.message_content)
+        )
       })
     })
     .catch(err => {
@@ -403,6 +367,44 @@ function renderChatList(chatId, receiver, receiverId, message) {
   })
 }
 
+function renderMessages(senderId, senderName, date, content) {
+  const messageBox = document.createElement('div')
+  const messageUser = document.createElement('span')
+  const messageTime = document.createElement('span')
+  const messageText = document.createElement('span')
+
+  messageBox.classList.add('message-box')
+  messageUser.classList.add('message-user')
+  messageTime.classList.add('message-time')
+  messageText.classList.add('message-text')
+
+  if (senderId === userId) {
+    messageBox.classList.add('own-message')
+  } else {
+    messageBox.classList.add('outside-message')
+    messageUser.innerText = senderName.toLowerCase()
+  }
+
+  const dateTimeZone = new Date(date)
+  const messageHours = dateTimeZone.getHours()
+  let messageMinutes
+
+  if (dateTimeZone.getMinutes() < 10) {
+    messageMinutes = `0${dateTimeZone.getMinutes()}`
+  } else {
+    messageMinutes = dateTimeZone.getMinutes()
+  }
+
+  messageTime.innerText = `${messageHours}:${messageMinutes}`
+
+  messageText.innerText = content
+
+  messageBox.append(messageUser, messageText, messageTime)
+  chatBox.append(messageBox)
+
+  chatBox.scrollTo(0, chatBox.scrollHeight)
+}
+
 socket.on('chat message', (msg, chat) => {
   const chatListItems = document.querySelectorAll('li.chat')
 
@@ -419,30 +421,7 @@ socket.on('chat message', (msg, chat) => {
   updateLastMessage(chat, msg.msgText)
 
   if (chat == currentChat) {
-    const messageBox = document.createElement('div')
-    const messageUser = document.createElement('span')
-    const messageTime = document.createElement('span')
-    const messageText = document.createElement('span')
-
-    messageBox.classList.add('message-box')
-    messageUser.classList.add('message-user')
-    messageTime.classList.add('message-time')
-    messageText.classList.add('message-text')
-
-    if (msg.user === user) {
-      messageBox.classList.add('own-message')
-    } else {
-      messageBox.classList.add('outside-message')
-      messageUser.innerText = msg.user.toLowerCase()
-    }
-
-    messageTime.innerText = `${msg.msgHour}:${msg.msgMinutes}`
-    messageText.innerText = msg.msgText
-
-    messageBox.append(messageUser, messageText, messageTime)
-    chatBox.append(messageBox)
-
-    chatBox.scrollTo(0, chatBox.scrollHeight)
+    renderMessages(msg.userId, msg.user, msg.date, msg.msgText)
   }
 })
 
