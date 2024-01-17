@@ -18,10 +18,28 @@
 
     <title>Chat</title>
   </head>
-  <body>
+  <body class="sidebar-hidden">
     <header>
       <h1>Chat</h1>
     </header>
+    <aside class="hidden">
+      <button id="new-chat">New Chat</button>
+      <div class="square hidden"></div>
+      <form class="new-chat-form hidden">
+        <div class="labels new-chat">
+          <label for="new-chat-user">User:</label>
+        </div>
+        <input
+          type="text"
+          id="new-chat-user"
+          name="new-chat-user"
+          placeholder="Chat with?"
+          required
+        />
+        <button id="start-new-chat">Start new chat</button>
+      </form>
+      <ul class="chats"></ul>
+    </aside>
     <main>
       <form class="login-form">
         <legend>If already registered, login below</legend>

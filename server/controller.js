@@ -1,4 +1,5 @@
 import { knx } from './db.js'
+
 const crypto = await import('crypto')
 
 const registerUser = async (req, res) => {
@@ -13,9 +14,12 @@ const registerUser = async (req, res) => {
       }
     ])
     .into('users')
-    .then(() => {
+    .then(user => {
       console.log(`${req.body.userName} registerd in DB successfully.`)
-      res.send(`Welcome, ${req.body.userName}`)
+      res.send({
+        message: `Welcome, ${req.body.userName}`,
+        userId: user[0]
+      })
     })
     .catch(err => {
       console.log('Error at registering new user.')
@@ -24,13 +28,17 @@ const registerUser = async (req, res) => {
 }
 
 const loginUser = async (req, res) => {
-  knx
+  let userId
+  let chats
+  let loginError = false
+  await knx
     .select('*')
     .from('users')
     .whereLike('user_name', `${req.body.userName}`)
     .then(user => {
       if (user.length === 0) {
         console.log(`User ${req.body.userName} not found in DB.`)
+        loginError = true
         return res
           .status(400)
           .send({ error: 'user', message: 'User not found' })
@@ -39,17 +47,46 @@ const loginUser = async (req, res) => {
         crypto.createHash('sha1').update(req.body.password).digest('hex')
       ) {
         console.log('Wrong password.')
+        loginError = true
         return res
           .status(400)
           .send({ error: 'password', message: 'Wrong password' })
       } else {
+        console.log(`${req.body.userName} found in DB.`)
+        userId = user[0].user_id
+      }
+    })
+    .then(async () => {
+      if (!loginError) {
+        await knx
+          .table('chats_users')
+          .join('users', 'chats_users.user_id', '=', 'users.user_id')
+          .join('chats', 'chats_users.chat_id', '=', 'chats.chat_id')
+          .select('users.user_name', 'chats_users.chat_id', 'chats.users')
+          .where('users.user_id', userId)
+          .then(data => {
+            chats = data
+          })
+          .catch(err => {
+            console.log(`Failed to retrieve chats from ${req.body.userName}`)
+            res.status(400).send(err)
+          })
+      }
+    })
+    .then(() => {
+      if (!loginError) {
+        res.send({
+          message: `Welcome, ${req.body.userName}`,
+          userId: userId,
+          userChats: chats
+        })
         console.log(`${req.body.userName} logged in.`)
-        res.send(`Welcome, ${req.body.userName}`)
       }
     })
     .catch(err => {
       console.log('Error at logging in.')
-      res.json(err)
+      console.log(userId)
+      res.status(400).send(err)
     })
 }
 
@@ -57,7 +94,10 @@ const newChat = async (req, res) => {
   let overallError = false
   let userError = false
   let chatError = false
+
   const users = []
+
+  let newChatId
 
   for (const user of req.body.users) {
     await knx
@@ -125,7 +165,8 @@ const newChat = async (req, res) => {
         ])
         .into('chats')
         .then(chat => {
-          console.log(`Chat #${chat[0]} registerd in table "chat"`)
+          newChatId = chat[0]
+          console.log(`Chat #${chat[0]} registerd in table "chats"`)
           users.map(user => {
             knx
               .insert([
@@ -150,7 +191,14 @@ const newChat = async (req, res) => {
         })
         .then(() => {
           console.log('All data registered successfully.')
-          res.status(200).send({ message: 'New chat registered successfully!' })
+          res.status(200).send({
+            message: 'New chat registered successfully!',
+            chat: {
+              chatId: newChatId,
+              chatReceiver: users[1].name,
+              chatReceiverId: users[1].userId
+            }
+          })
         })
         .catch(err => {
           overallError = true
@@ -161,4 +209,51 @@ const newChat = async (req, res) => {
   }
 }
 
-export { registerUser, loginUser, newChat }
+const sendMessage = async (req, res) => {
+  knx
+    .insert([
+      {
+        chat_id: req.body.chatId,
+        sender_user_id: req.body.sender,
+        receiver_user_id: req.body.receiver,
+        message_time: req.body.time,
+        message_content: req.body.content
+      }
+    ])
+    .into('messages')
+    .then(response => {
+      console.log(
+        `User ${req.body.sender} sent a message to ${req.body.receiver}. Message #${response[0]}`
+      )
+      res.status(200).send({ message: 'Message deliverd.' })
+    })
+    .catch(() => {
+      res.status(400).send({
+        error: 'message delivery error',
+        message: 'Unable to deliver message.'
+      })
+    })
+}
+
+const fetchChatMessages = async (req, res) => {
+  knx
+    .table('messages')
+    .join('users', 'messages.sender_user_id', '=', 'users.user_id')
+    .select(
+      'messages.sender_user_id',
+      'messages.receiver_user_id',
+      'users.user_name as sender_name',
+      'messages.message_time',
+      'messages.message_content'
+    )
+    .where('messages.chat_id', req.body.chatId)
+    .then(messages => {
+      console.log(`Messages from chat ${req.body.chatId} fetched`)
+      res.status(200).send(messages)
+    })
+    .catch(err => {
+      res.send(err)
+    })
+}
+
+export { registerUser, loginUser, newChat, sendMessage, fetchChatMessages }
