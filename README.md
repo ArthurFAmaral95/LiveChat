@@ -12,7 +12,8 @@ This project is a simple chat box where people can talk to each other online.
 
 <p>
 On the first acces to the chat page, the user will be asked to type in a name to start chating. After that, the chat box will show up and it will be possible to send messages to other users. <br>
-Each tab open in the browser will be a different user and the position and layout of the messages will be different according to who is the sender and who is the receiver of the message.
+Each tab open in the browser will be a different user and the position and layout of the messages will be different according to who is the sender and who is the receiver of the message. <br>
+If user name or password is incorrect, a message will be displayed. If user is not yet registered in database, it will be asked to register in the form below.
 </p>
 
 ## 🚀 Technologies
@@ -27,4 +28,4 @@ This project was developed using the following technologies:
 
 ## 🔖 How to access it
 
-- Download the zip file, download the modules needed with <code>npm install</code>, run <code>npm run server</code> on the terminal and access localhost on a browser.
+- Download the zip file, download the modules needed with <code>npm install</code>, run <code>npm run chat</code> on the terminal and access localhost on a browser.
